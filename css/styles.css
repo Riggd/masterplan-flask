@@ -8,6 +8,7 @@
     max-width: 100em;
     padding-left: 2em;
     padding-right: 2em;
+    border-left: 1px solid #000;
     border-bottom: 1px solid #000;
 }
 
@@ -48,27 +49,51 @@ button, .button {
     background: #FFF;
 }
 
+.sap {
+    background: #E55957;
+}
+
+.web {
+    background: #E5E557;
+}
+
+.progressdb {
+    background: #52B747;
+}
+
+.center-vert {
+    vertical-align: middle;
+}
+
 .wrapper {
-    background: #54AD98;
+    background: #EDEDED;
     position: relative;
     z-index: 2;
     height: 100%;
 }
 
 .row-heading {
-    padding: 2em 0;    
+    padding: 2em;   
+    border-right: 1px solid #000;
+}
+
+#entwicklung, #kaufservice, #einkauf, #lager, 
+#qs, #arbeit, #produktplanung, #finishen, #vertrieb {
+    margin-top: 1em;
 }
 
 .module  {
     border: 1px solid #000;
     padding: .5em;
-    margin: 1.5em 1em;
     display: inline-block;
-    width: 90px;
+    width: 120px;
     word-wrap: break-word;
+    vertical-align: middle;
+    position: absolute;
+    text-align: center;
 }
 
-.entwick {
+.left-border {
     border-left: 1px solid #000;
 }
 
