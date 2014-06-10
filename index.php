@@ -71,7 +71,7 @@
             
             $( "#dialog-form" ).dialog({
                 autoOpen: false,
-                height: 500,
+                height: 400,
                 width: 350,
                 modal: true,
                 buttons: { 
@@ -93,8 +93,8 @@
                         if ( bValid ) {                                                
                             var id = $("#rowgroup").children(":selected").attr("id");                        
                             var style = $("#statecolor").children(":selected").attr("id");                        
-                            
-                            var module = $("<div>",{ id: "module"+count}).html(name.val()).css({width: '120px'}).appendTo("#"+id);
+                            var module = $("<div>",{ id: "module"+count}).html(name.val()).css({width: '120px'}).appendTo("#entwicklung");
+                            jsPlumb.repaintEverything();
                             jsPlumb.addEndpoint($("#module"+count), targetEndpoint);
                             jsPlumb.addEndpoint($("#module"+count), sourceEndpoint);
                             jsPlumb.draggable($("#module"+count));
@@ -107,10 +107,11 @@
                             count++;
                             $( this ).dialog( "close" );
                             jsPlumb.repaintEverything();
+                            jsPlumb.recalculateOffsets($(this).parent()); 
                         } 
                     },
                     
-                    Cancel: function() {
+                    "Abrechen": function() {
                         $( this ).dialog( "close" );                    
                     },
                 }
@@ -155,7 +156,10 @@
                 var $this = $(this);
                 $this.parent().text($this.val() || oriVal);
                 $this.remove();
-                jsPlumb.repaintEverything();
+                jsPlumb.repaintEverything(); 
+                if ($this.val() == "löschen"){                    
+                    jsPlumb.remove($this.parent());
+                }
             });
             
             $(".row").on('keyup', '.module > input', function (e) {                
@@ -163,53 +167,57 @@
                     var $this = $(this);
                     $this.parent().text($this.val() || oriVal);
                     $this.remove();
-                    jsPlumb.repaintEverything(); 
+                    jsPlumb.repaintEverything();                   
+                }
+                
+                if ($(this).val() == "löschen"){
+                    jsPlumb.remove($(this).parent());
                 }
             });
-            
-            
-        //Setting up drop options
-        
-
-            //Setting up a Target endPoint
+               
+            var anchorPointsTop = ["Top", "TopLeft", "TopRight", "Right", "Left"];
             var targetColor = "#aa1100";
             var targetEndpoint = {
-                //container: "parent",
-                anchor: "TopCenter", //Placement of Dot
+                anchors: anchorPointsTop, //Placement of Dot
                 endpoint: ["Dot", { radius: 4}], //Other types are rectangle, Image, Blank, Triangle
                 paintStyle: { fillStyle: targetColor }, //Line color
                 isSource: true, //Starting point of the connector
                 scope: "red dot",
-                connectorStyle: { strokeStyle: targetColor, lineWidth: 5 }, // Means Bridge width and bridge color
-                connector: ["Flowchart", { curviness: 50}], //Other properties Bezier
+                connectorStyle: { strokeStyle: targetColor, lineWidth: 4}, // Means Bridge width and bridge color
+                connector: ["Flowchart"], //Other properties Bezier
                 maxConnections: -1, //No upper limit
                 isTarget: true, //Means same color is allowed to accept the connection
                 //dragOptions: targetDragOptions, //Means when the drag is started, other terminals will start to highlight
             };
 
             //Setting up a Source endPoint
-            var sourceColor = "#aa1100";
+            var sourceColor = "#0800A8";
+            var anchorPoints = ["Bottom", "BottomLeft", "BottomRight", "Right", "Left"];
             var sourceEndpoint = {
-                //container: "parent",
-                anchor: "BottomCenter",
+                anchors: anchorPoints,
                 endpoint: ["Dot", { radius: 4}],
                 paintStyle: { fillStyle: sourceColor },
                 isSource: true,
                 scope: "red dot",
-                connectorStyle: { strokeStyle: sourceColor, lineWidth: 5 },
-                connector: ["Flowchart", { curviness: 50}],
+                connectorStyle: { strokeStyle: sourceColor, lineWidth: 4 },
+                connector: ["Flowchart"],
                 maxConnections: -1,
                 isTarget: true,
-                //dragOptions: targetDragOptions,
             };
-
+            
+            //var connection = jsPlumb.connect({source:"d1", target:"d2"});
+            jsPlumb.bind("click", function(conn) {
+                jsPlumb.detach(conn);
+            });
+            
             jsPlumb.bind("ready", function () {
                 
                 //Set up endpoints on the divs
                 jsPlumb.addEndpoint($("#module"+count), targetEndpoint);
                 jsPlumb.addEndpoint($("#module"+count), sourceEndpoint);
-
+                
                 jsPlumb.draggable($("#module"+count));
+                
                 //jsPlumb.repaint("#module"+count);
             });
             
@@ -239,21 +247,17 @@
 <body>
 
     <header id="header" class="header">
-        <button id="addModule" class="">Add a Module</button>
-        <button id="addConncet" class="">Connect Module</button>
-
-    
-    
+        <button id="addModule" class="">Neue Modul Einfügen</button>
     </header>
     <div class="wrapper">
     
-    <div id="dialog-form" title="Create new module">
-        <p class="validateTips">All form fields are required.</p>
-        <form>
+    <div id="dialog-form" title="Neue Modul einrichten">
+        <p class="validateTips">Bitte füllen Sie alle Felder.</p>
+        <form onsubmit="return false;">
         <fieldset>
         <label for="name">Name</label>
         <input type="text" name="name" id="name" class="text">
-        <label for="rowgroup">Row Group</label>
+        <!--<label for="rowgroup">Row Group</label>
         <select id="rowgroup">
             <option value="entwicklung" id="entwicklung">Entwicklung</option>
             <option value="kaufservice" id="kaufservice">Kaufm. Service / CO</option>
@@ -264,12 +268,13 @@
             <option value="produktplanung" id="produktplanung">Produktionsplanung</option>
             <option value="finishen" id="finishen">Produktion Finishen</option>
             <option value="vertrieb" id="vertrieb">Vertrieb</option>
-        </select>
+        </select>-->
         <label for="statecolor">State</label>
         <select id="statecolor">
             <option id="progressdb" value="progress">Progress Database</option>
             <option id="web" value="web">Weblösungen</option>
             <option id="sap" value="sap">SAP Tool</option>
+            <option id="empty" value="empty">No Style</option>
         </select>
         </fieldset>
         </form>
